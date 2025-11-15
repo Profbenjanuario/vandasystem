@@ -158,35 +158,5 @@
             </div>
         </div>
     </div>
-    
-    <script>
-    // Função para formatar moeda
-    function formatarMoeda(valor) {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        }).format(valor);
-    }
-
-    // Atualizar estatísticas de produtos
-    function atualizarEstatisticasProdutos() {
-        const produtos = window.parent.produtos || [];
-        const produtosEstoque = produtos.filter(p => p.estoque > 0).length;
-        const valorTotalEstoque = produtos.reduce((sum, p) => sum + (p.preco * p.estoque), 0);
-        const produtosBaixoEstoque = produtos.filter(p => p.estoque > 0 && p.estoque <= 5).length;
-        
-        document.getElementById('total-produtos-ativo').textContent = produtosEstoque;
-        document.getElementById('total-valor-estoque').textContent = formatarMoeda(valorTotalEstoque);
-        document.getElementById('produtos-baixo-estoque').textContent = produtosBaixoEstoque;
-    }
-
-    // Carregar dados quando a página for carregada
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.parent.carregarProdutos) {
-            window.parent.carregarProdutos();
-        }
-        atualizarEstatisticasProdutos();
-    });
-    </script>
 </body>
 </html>
