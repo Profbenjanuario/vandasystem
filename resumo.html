@@ -170,44 +170,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-    // Atualizar estatísticas adicionais
-    async function atualizarEstatisticasAdicionais() {
-        const totalProdutos = window.parent.produtos.length;
-        const produtosEstoque = window.parent.produtos.filter(p => p.estoque > 0).length;
-        const produtosSemEstoque = window.parent.produtos.filter(p => p.estoque <= 0).length;
-        
-        const hoje = new Date().toISOString().split('T')[0];
-        const vendasHoje = window.parent.vendas.filter(v => v.data.split('T')[0] === hoje).length;
-        
-        document.getElementById('total-produtos').textContent = totalProdutos;
-        document.getElementById('produtos-estoque').textContent = produtosEstoque;
-        document.getElementById('produtos-sem-estoque').textContent = produtosSemEstoque;
-        document.getElementById('vendas-hoje').textContent = vendasHoje;
-    }
-
-    // Função para formatar moeda
-    function formatarMoeda(valor) {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        }).format(valor);
-    }
-
-    // Função para formatar data
-    function formatarData(dataString) {
-        const data = new Date(dataString);
-        return data.toLocaleDateString('pt-BR');
-    }
-
-    // Carregar dados quando a página for carregada
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.parent.carregarResumo) {
-            window.parent.carregarResumo();
-        }
-        atualizarEstatisticasAdicionais();
-    });
-    </script>
 </body>
 </html>
