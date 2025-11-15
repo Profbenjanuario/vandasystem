@@ -1,0 +1,155 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2 page-title"><i class="fas fa-chart-bar me-2"></i>Resumo do Sistema</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button class="btn btn-primary" onclick="carregarResumo()">
+            <i class="fas fa-sync-alt me-1"></i>Atualizar
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3 stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Total de Vendas</h5>
+                        <h2 id="total-vendas" class="card-text">0</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shopping-cart fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3 stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Valor Total</h5>
+                        <h2 id="total-valor" class="card-text">R$ 0,00</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-dollar-sign fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3 stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Venda Média</h5>
+                        <h2 id="venda-media" class="card-text">R$ 0,00</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3 stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Vendas Este Mês</h5>
+                        <h2 id="vendas-mes" class="card-text">0</h2>
+                        <small id="total-mes">R$ 0,00</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-calendar-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Vendas Recentes</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group" id="vendas-recentes">
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-2">Carregando vendas...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-tachometer-alt me-2"></i>Status do Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        Produtos Cadastrados
+                        <span class="badge bg-primary rounded-pill" id="total-produtos">0</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        Produtos em Estoque
+                        <span class="badge bg-success rounded-pill" id="produtos-estoque">0</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        Produtos Sem Estoque
+                        <span class="badge bg-danger rounded-pill" id="produtos-sem-estoque">0</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        Hoje
+                        <span class="badge bg-info rounded-pill" id="vendas-hoje">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-rocket me-2"></i>Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="carregarPagina('nova-venda')">
+                        <i class="fas fa-plus-circle me-1"></i>Nova Venda
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="carregarPagina('produtos')">
+                        <i class="fas fa-box me-1"></i>Gerenciar Produtos
+                    </button>
+                    <button class="btn btn-outline-success" onclick="carregarPagina('relatorio')">
+                        <i class="fas fa-chart-line me-1"></i>Ver Relatórios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Atualizar estatísticas adicionais
+async function atualizarEstatisticasAdicionais() {
+    const totalProdutos = produtos.length;
+    const produtosEstoque = produtos.filter(p => p.estoque > 0).length;
+    const produtosSemEstoque = produtos.filter(p => p.estoque <= 0).length;
+    
+    const hoje = new Date().toISOString().split('T')[0];
+    const vendasHoje = vendas.filter(v => v.data.split('T')[0] === hoje).length;
+    
+    document.getElementById('total-produtos').textContent = totalProdutos;
+    document.getElementById('produtos-estoque').textContent = produtosEstoque;
+    document.getElementById('produtos-sem-estoque').textContent = produtosSemEstoque;
+    document.getElementById('vendas-hoje').textContent = vendasHoje;
+}
+              </script>
