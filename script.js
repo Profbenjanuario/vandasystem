@@ -1,6 +1,6 @@
 // ATUALIZE ESTES VALORES COM SUAS CREDENCIAIS DO SUPABASE
-const SUPABASE_URL = 'https://seu-projeto.supabase.co';
-const SUPABASE_ANON_KEY = 'sua-chave-anon-publica';
+const SUPABASE_URL = 'https://unwhdctlggclczeqgpfz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVud2hkY3RsZ2djbGN6ZXFncGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMjQyODcsImV4cCI6MjA3ODgwMDI4N30.i4x3bxLcjxfJtCB8pQVUqJIf7qGPz_qBgYV_jVxhhjQ';
 
 // Variáveis globais
 let produtos = [];
