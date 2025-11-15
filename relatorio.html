@@ -170,56 +170,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-    function limparFiltros() {
-        document.getElementById('data-inicio').value = '';
-        document.getElementById('data-fim').value = '';
-        document.getElementById('tabela-vendas').innerHTML = `
-            <tr>
-                <td colspan="4" class="text-center text-muted">
-                    <i class="fas fa-chart-bar fa-2x mb-2"></i>
-                    <p>Selecione um período para gerar o relatório</p>
-                </td>
-            </tr>
-        `;
-        document.getElementById('tabela-produtos').innerHTML = `
-            <tr>
-                <td colspan="3" class="text-center text-muted">
-                    <i class="fas fa-box fa-2x mb-2"></i>
-                    <p>Nenhum dado disponível</p>
-                </td>
-            </tr>
-        `;
-        
-        // Resetar estatísticas
-        document.getElementById('relatorio-total-vendas').textContent = '0';
-        document.getElementById('relatorio-total-valor').textContent = 'R$ 0,00';
-        document.getElementById('relatorio-venda-media').textContent = 'R$ 0,00';
-    }
-
-    function exportarVendasCSV() {
-        const dataInicio = document.getElementById('data-inicio').value;
-        const dataFim = document.getElementById('data-fim').value;
-        
-        if (!dataInicio || !dataFim) {
-            window.parent.mostrarMensagem('Selecione um período para exportar', 'warning');
-            return;
-        }
-        
-        window.parent.mostrarMensagem('Funcionalidade de exportação em desenvolvimento', 'info');
-    }
-
-    function exportarProdutosCSV() {
-        window.parent.mostrarMensagem('Funcionalidade de exportação em desenvolvimento', 'info');
-    }
-
-    // Carregar dados quando a página for carregada
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.parent.carregarRelatorio) {
-            window.parent.carregarRelatorio();
-        }
-    });
-    </script>
 </body>
   </html>
