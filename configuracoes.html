@@ -132,54 +132,11 @@
                         <p><strong>Versão:</strong> 2.0.0</p>
                         <p><strong>Banco de Dados:</strong> Supabase</p>
                         <p><strong>Desenvolvido com:</strong> HTML, CSS, JavaScript</p>
-                        <p class="mb-0"><strong>Última atualização:</strong> <span id="data-atualizacao"></span></p>
+                        <p class="mb-0"><strong>Última actualização:</strong> <span id="data-atualizacao"></span></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    // Atualizar estatísticas de configurações
-    function atualizarEstatisticasConfig() {
-        const produtos = window.parent.produtos || [];
-        const vendas = window.parent.vendas || [];
-        const configuracoes = window.parent.configuracoes || {};
-        
-        document.getElementById('config-total-produtos').textContent = produtos.length;
-        document.getElementById('config-total-vendas').textContent = vendas.length;
-        document.getElementById('config-total-config').textContent = configuracoes && configuracoes.id ? 1 : 0;
-        document.getElementById('data-atualizacao').textContent = new Date().toLocaleDateString('pt-BR');
-    }
-
-    function fazerBackup() {
-        window.parent.mostrarMensagem('Funcionalidade de backup em desenvolvimento', 'info');
-    }
-
-    function limparCache() {
-        localStorage.clear();
-        window.parent.mostrarMensagem('Cache limpo com sucesso!', 'success');
-        setTimeout(() => {
-            location.reload();
-        }, 2000);
-    }
-
-    function resetarSistema() {
-        if (confirm('ATENÇÃO: Esta ação irá resetar todo o sistema e apagar todos os dados. Tem certeza?')) {
-            if (confirm('CONFIRMAÇÃO FINAL: Esta ação não pode ser desfeita. Tem certeza absoluta?')) {
-                window.parent.mostrarMensagem('Funcionalidade de reset em desenvolvimento', 'info');
-            }
-        }
-    }
-
-    // Carregar dados quando a página for carregada
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.parent.carregarConfiguracoes) {
-            window.parent.carregarConfiguracoes();
-        }
-        atualizarEstatisticasConfig();
-    });
-    </script>
 </body>
 </html>
