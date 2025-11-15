@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Painel de Vendas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-title {
+            color: #333;
+            font-weight: 600;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        .stats-card {
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            margin: 0 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2 page-title"><i class="fas fa-box me-2"></i>Gerenciar Produtos</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <button class="btn btn-primary" id="btn-novo-produto" onclick="window.parent.mostrarFormProduto()">
+                    <i class="fas fa-plus me-1"></i>Novo Produto
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulário de Produto -->
+        <div class="card mb-4 d-none" id="form-produto-container">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-edit me-2"></i>Cadastrar Produto</h5>
+            </div>
+            <div class="card-body">
+                <form id="form-produto">
+                    <input type="hidden" id="produto-id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome do Produto *</label>
+                                <input type="text" class="form-control" id="nome" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoria</label>
+                                <input type="text" class="form-control" id="categoria" placeholder="Ex: Eletrônicos, Roupas...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao" rows="2" placeholder="Descrição do produto..."></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="preco" class="form-label">Preço *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" id="preco" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="estoque" class="form-label">Estoque *</label>
+                                <input type="number" class="form-control" id="estoque" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-control-plaintext">
+                                    <span class="badge bg-success" id="status-estoque">Disponível</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary" onclick="window.parent.salvarProdutoForm()">
+                            <i class="fas fa-save me-1"></i>Salvar Produto
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.parent.cancelarFormProduto()">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Lista de Produtos</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="fas fa-tag me-1"></i>Nome</th>
+                                <th><i class="fas fa-align-left me-1"></i>Descrição</th>
+                                <th><i class="fas fa-folder me-1"></i>Categoria</th>
+                                <th><i class="fas fa-dollar-sign me-1"></i>Preço</th>
+                                <th><i class="fas fa-boxes me-1"></i>Estoque</th>
+                                <th><i class="fas fa-cog me-1"></i>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-produtos">
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Carregando...</span>
+                                    </div>
+                                    <p class="mt-2">Carregando produtos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="stats-card bg-success">
+                    <h3 id="total-produtos-ativo">0</h3>
+                    <p class="mb-0">Produtos em Estoque</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card bg-warning">
+                    <h3 id="total-valor-estoque">R$ 0,00</h3>
+                    <p class="mb-0">Valor Total em Estoque</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card bg-danger">
+                    <h3 id="produtos-baixo-estoque">0</h3>
+                    <p class="mb-0">Produtos com Estoque Baixo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Função para formatar moeda
+    function formatarMoeda(valor) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(valor);
+    }
+
+    // Atualizar estatísticas de produtos
+    function atualizarEstatisticasProdutos() {
+        const produtos = window.parent.produtos || [];
+        const produtosEstoque = produtos.filter(p => p.estoque > 0).length;
+        const valorTotalEstoque = produtos.reduce((sum, p) => sum + (p.preco * p.estoque), 0);
+        const produtosBaixoEstoque = produtos.filter(p => p.estoque > 0 && p.estoque <= 5).length;
+        
+        document.getElementById('total-produtos-ativo').textContent = produtosEstoque;
+        document.getElementById('total-valor-estoque').textContent = formatarMoeda(valorTotalEstoque);
+        document.getElementById('produtos-baixo-estoque').textContent = produtosBaixoEstoque;
+    }
+
+    // Carregar dados quando a página for carregada
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.parent.carregarProdutos) {
+            window.parent.carregarProdutos();
+        }
+        atualizarEstatisticasProdutos();
+    });
+    </script>
+</body>
+</html>
