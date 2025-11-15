@@ -162,27 +162,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-    // Atualizar informações de estoque na página nova venda
-    function atualizarInfoEstoque() {
-        const produtos = window.parent.produtos || [];
-        const totalProdutos = produtos.length;
-        const produtosDisponiveis = produtos.filter(p => p.estoque > 0).length;
-        const produtosIndisponiveis = produtos.filter(p => p.estoque <= 0).length;
-        
-        document.getElementById('info-total-produtos').textContent = totalProdutos;
-        document.getElementById('info-produtos-disponiveis').textContent = produtosDisponiveis;
-        document.getElementById('info-produtos-indisponiveis').textContent = produtosIndisponiveis;
-    }
-
-    // Carregar dados quando a página for carregada
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.parent.carregarNovaVenda) {
-            window.parent.carregarNovaVenda();
-        }
-        atualizarInfoEstoque();
-    });
-    </script>
 </body>
 </html>
