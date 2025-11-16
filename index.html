@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VandaSystem - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>VandaSystem</h1>
+            <nav>
+                <button onclick="navegarPara('dashboard')" class="nav-btn">Dashboard</button>
+                <button onclick="navegarPara('vendas')" class="nav-btn">Vendas</button>
+                <button onclick="navegarPara('produtos')" class="nav-btn">Produtos</button>
+                <button onclick="navegarPara('relatorios')" class="nav-btn">Relatórios</button>
+                <button onclick="navegarPara('configuracoes')" class="nav-btn">Configurações</button>
+            </nav>
+        </header>
+
+        <main>
+            <div id="dashboard" class="page active">
+                <h2>Dashboard</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Vendas Hoje</h3>
+                        <p id="vendas-hoje">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total em Caixa</h3>
+                        <p id="total-caixa">R$ 0,00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Produtos Cadastrados</h3>
+                        <p id="total-produtos">0</p>
+                    </div>
+                </div>
+                <button onclick="navegarPara('nova-venda')" class="btn-primary">Nova Venda</button>
+            </div>
+
+            <div id="vendas" class="page">
+                <h2>Vendas</h2>
+                <button onclick="navegarPara('nova-venda')" class="btn-primary">Nova Venda</button>
+                <div id="lista-vendas" class="vendas-list"></div>
+            </div>
+
+            <div id="nova-venda" class="page">
+                <h2>Nova Venda</h2>
+                <div class="venda-form">
+                    <select id="produto-select">
+                        <option value="">Selecione um produto</option>
+                    </select>
+                    <input type="number" id="quantidade" placeholder="Quantidade" min="1" value="1">
+                    <button onclick="adicionarProdutoVenda()" class="btn-secondary">Adicionar</button>
+                </div>
+                <table id="tabela-venda">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Preço Unit.</th>
+                            <th>Subtotal</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itens-venda"></tbody>
+                </table>
+                <div class="venda-total">
+                    <h3>Total: <span id="total-venda">R$ 0,00</span></h3>
+                    <button onclick="finalizarVenda()" class="btn-primary">Finalizar Venda</button>
+                </div>
+            </div>
+
+            <div id="produtos" class="page">
+                <h2>Produtos</h2>
+                <button onclick="abrirModalProduto()" class="btn-primary">Novo Produto</button>
+                <div id="lista-produtos" class="produtos-grid"></div>
+            </div>
+
+            <div id="relatorios" class="page">
+                <h2>Relatórios</h2>
+                <div class="filtros">
+                    <input type="date" id="data-inicio">
+                    <input type="date" id="data-fim">
+                    <button onclick="gerarRelatorio()" class="btn-primary">Gerar Relatório</button>
+                </div>
+                <div id="relatorio-conteudo"></div>
+            </div>
+
+            <div id="configuracoes" class="page">
+                <h2>Configurações</h2>
+                <form id="config-form">
+                    <label>Nome da Empresa:</label>
+                    <input type="text" id="empresa-nome">
+                    <label>CNPJ:</label>
+                    <input type="text" id="empresa-cnpj">
+                    <label>Telefone:</label>
+                    <input type="text" id="empresa-telefone">
+                    <button type="button" onclick="salvarConfiguracoes()" class="btn-primary">Salvar</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Produto -->
+    <div id="modal-produto" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-titulo">Novo Produto</h3>
+            <form id="produto-form">
+                <input type="hidden" id="produto-id">
+                <label>Nome:</label>
+                <input type="text" id="produto-nome" required>
+                <label>Preço:</label>
+                <input type="number" id="produto-preco" step="0.01" required>
+                <label>Estoque:</label>
+                <input type="number" id="produto-estoque" required>
+                <label>Descrição:</label>
+                <textarea id="produto-descricao"></textarea>
+                <div class="modal-actions">
+                    <button type="button" onclick="fecharModalProduto()">Cancelar</button>
+                    <button type="submit">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
