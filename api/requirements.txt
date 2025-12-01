@@ -1,0 +1,6 @@
+# api/requirements.txt
+fastapi
+uvicorn[standard]
+httpx
+python-jose[cryptography]
+python-dotenv
