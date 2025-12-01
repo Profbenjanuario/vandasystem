@@ -1,22 +1,23 @@
 # api/main.py
-import os
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime
 import httpx
-import jwt
+from jose import jwt
 
 app = FastAPI(title="Stunner System API")
-# Adicione esta rota no seu main.py
+
+# ✅ ROTA DE SAÚDE OBRIGATÓRIA NO RENDER
 @app.get("/")
 async def health_check():
     return {"status": "online", "service": "Stunner System API"}
-# CORS — permite requisições do GitHub Pages
+
+# ✅ CORS — permite GitHub Pages
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Em produção, troque por ["https://seu-usuario.github.io"]
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,21 +33,22 @@ class SaleRequest(BaseModel):
 
 @app.post("/api/sale")
 async def create_sale(sale: SaleRequest, request: Request):
-    # Pega headers
+    # Obter cabeçalhos
     auth_header = request.headers.get("authorization")
     supabase_url = request.headers.get("x-supabase-url")
     supabase_key = request.headers.get("x-supabase-key")
 
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Token ausente")
+        raise HTTPException(status_code=401, detail="Token de autenticação ausente")
     if not supabase_url or not supabase_key:
-        raise HTTPException(status_code=400, detail="Configuração do cliente ausente")
+        raise HTTPException(status_code=400, detail="Configuração do Supabase ausente")
 
     token = auth_header.split(" ")[1]
+
+    # ✅ Extrai user_id do token do Supabase (sem validar assinatura — suficiente para identificação)
     try:
-        # Decodifica o JWT (use a JWT_SECRET do Supabase do cliente)
-        decoded = jwt.decode(token, options={"verify_signature": False})  # Simples: confia no token
-        user_id = decoded["sub"]
+        payload = jwt.get_unverified_claims(token)
+        user_id = payload["sub"]
     except Exception:
         raise HTTPException(status_code=401, detail="Token inválido")
 
@@ -60,17 +62,18 @@ async def create_sale(sale: SaleRequest, request: Request):
         total_amount = 0.0
         validated_items = []
 
-        # Valida cada item
+        # Validar cada item
         for item in sale.items:
             if item.quantity <= 0:
-                raise HTTPException(status_code=400, detail="Quantidade inválida")
+                raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero")
 
+            # Buscar produto real
             prod_resp = await client.get(
                 f"{supabase_url}/rest/v1/products?id=eq.{item.product_id}",
                 headers=headers
             )
             if prod_resp.status_code != 200 or not prod_resp.json():
-                raise HTTPException(status_code=404, detail=f"Produto não encontrado")
+                raise HTTPException(status_code=404, detail=f"Produto ID {item.product_id} não encontrado")
 
             product = prod_resp.json()[0]
             if item.quantity > product["stock_quantity"]:
@@ -87,7 +90,7 @@ async def create_sale(sale: SaleRequest, request: Request):
 
         final_total = max(0.0, total_amount - sale.global_discount)
 
-        # Registra venda
+        # Registrar venda
         sale_resp = await client.post(
             f"{supabase_url}/rest/v1/sales",
             json={
@@ -99,10 +102,10 @@ async def create_sale(sale: SaleRequest, request: Request):
             headers=headers
         )
         if sale_resp.status_code != 201:
-            raise HTTPException(status_code=500, detail="Erro ao registrar venda")
+            raise HTTPException(status_code=500, detail="Falha ao registrar venda")
         sale_id = sale_resp.json()[0]["id"]
 
-        # Registra itens e atualiza stock
+        # Registrar itens e atualizar stock
         for item in validated_items:
             await client.post(
                 f"{supabase_url}/rest/v1/sale_items",
@@ -115,4 +118,4 @@ async def create_sale(sale: SaleRequest, request: Request):
                 headers=headers
             )
 
-        return {"sale_id": sale_id, "message": "Venda confirmada"}
+        return {"sale_id": sale_id, "message": "Venda confirmada com sucesso"}
