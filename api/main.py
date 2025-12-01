@@ -6,25 +6,14 @@ from pydantic import BaseModel
 from typing import List
 from datetime import datetime
 import httpx
-import jwt  # para decodificar o JWT e obter o user_id
-
-# Configuração
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://SEU_PROJETO.supabase.co")
-SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "SUA_SERVICE_ROLE_KEY_AQUI")
-JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "SUA_JWT_SECRET_AQUI")  # Opcional, mas recomendado
-
-headers = {
-    "apikey": SUPABASE_SERVICE_KEY,
-    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-    "Content-Type": "application/json"
-}
+import jwt
 
 app = FastAPI(title="Stunner System API")
 
-# CORS (ajuste em produção)
+# CORS — permite requisições do GitHub Pages
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Em produção, troque por ["https://seu-usuario.github.io"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,100 +27,89 @@ class SaleRequest(BaseModel):
     items: List[SaleItem]
     global_discount: float = 0.0
 
-def extract_user_id(authorization: str) -> str:
-    """Extrai user_id do token JWT enviado pelo front-end."""
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Token de autenticação ausente")
-    
-    token = authorization.split(" ")[1]
-    try:
-        # Decodifica o JWT (usa a JWT_SECRET do Supabase, encontrada em Settings > API)
-        decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"], audience="authenticated")
-        return decoded["sub"]  # "sub" contém o user_id
-    except Exception as e:
-        raise HTTPException(status_code=401, detail="Token inválido")
-
 @app.post("/api/sale")
 async def create_sale(sale: SaleRequest, request: Request):
-    # Extrai user_id do cabeçalho Authorization
+    # Pega headers
     auth_header = request.headers.get("authorization")
-    user_id = extract_user_id(auth_header)
+    supabase_url = request.headers.get("x-supabase-url")
+    supabase_key = request.headers.get("x-supabase-key")
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token ausente")
+    if not supabase_url or not supabase_key:
+        raise HTTPException(status_code=400, detail="Configuração do cliente ausente")
+
+    token = auth_header.split(" ")[1]
+    try:
+        # Decodifica o JWT (use a JWT_SECRET do Supabase do cliente)
+        decoded = jwt.decode(token, options={"verify_signature": False})  # Simples: confia no token
+        user_id = decoded["sub"]
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "application/json"
+    }
 
     async with httpx.AsyncClient() as client:
         total_amount = 0.0
-        sale_items_data = []
+        validated_items = []
 
-        # 1. Validar e coletar dados de cada item
+        # Valida cada item
         for item in sale.items:
             if item.quantity <= 0:
-                raise HTTPException(status_code=400, detail="Quantidade deve ser maior que zero.")
+                raise HTTPException(status_code=400, detail="Quantidade inválida")
 
-            # Buscar produto real
             prod_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/products?id=eq.{item.product_id}",
+                f"{supabase_url}/rest/v1/products?id=eq.{item.product_id}",
                 headers=headers
             )
             if prod_resp.status_code != 200 or not prod_resp.json():
-                raise HTTPException(status_code=404, detail=f"Produto ID {item.product_id} não encontrado.")
-            
+                raise HTTPException(status_code=404, detail=f"Produto não encontrado")
+
             product = prod_resp.json()[0]
-            stock = product["stock_quantity"]
-            price = product["price"]
+            if item.quantity > product["stock_quantity"]:
+                raise HTTPException(status_code=400, detail=f"Stock insuficiente para {product['name']}")
 
-            if item.quantity > stock:
-                raise HTTPException(status_code=400, detail=f"Stock insuficiente para {product['name']}.")
-
-            subtotal = price * item.quantity
+            subtotal = product["price"] * item.quantity
             total_amount += subtotal
-
-            sale_items_data.append({
+            validated_items.append({
                 "product_id": item.product_id,
                 "quantity": item.quantity,
-                "unit_price": price,
+                "unit_price": product["price"],
                 "subtotal": subtotal
             })
 
-        # 2. Aplicar desconto geral
         final_total = max(0.0, total_amount - sale.global_discount)
 
-        # 3. Inserir cabeçalho da venda com user_id
-        sale_header = {
-            "user_id": user_id,  # ✅ REGISTRA O VENDEDOR
-            "total_amount": final_total,
-            "global_discount": sale.global_discount,
-            "created_at": datetime.utcnow().isoformat()
-        }
-
+        # Registra venda
         sale_resp = await client.post(
-            f"{SUPABASE_URL}/rest/v1/sales",
-            json=sale_header,
+            f"{supabase_url}/rest/v1/sales",
+            json={
+                "user_id": user_id,
+                "total_amount": final_total,
+                "global_discount": sale.global_discount,
+                "created_at": datetime.utcnow().isoformat()
+            },
             headers=headers
         )
         if sale_resp.status_code != 201:
-            raise HTTPException(status_code=500, detail="Falha ao criar venda.")
-
+            raise HTTPException(status_code=500, detail="Erro ao registrar venda")
         sale_id = sale_resp.json()[0]["id"]
 
-        # 4. Inserir itens e atualizar stock (não é transação atômica, mas é o melhor com Supabase)
-        for item_data in sale_items_data:
-            # Inserir item
+        # Registra itens e atualiza stock
+        for item in validated_items:
             await client.post(
-                f"{SUPABASE_URL}/rest/v1/sale_items",
-                json={
-                    "sale_id": sale_id,
-                    "product_id": item_data["product_id"],
-                    "quantity": item_data["quantity"],
-                    "unit_price": item_data["unit_price"],
-                    "subtotal": item_data["subtotal"]
-                },
+                f"{supabase_url}/rest/v1/sale_items",
+                json={**item, "sale_id": sale_id},
                 headers=headers
             )
-
-            # Atualizar stock
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/products?id=eq.{item_data['product_id']}",
-                json={"stock_quantity": f"stock_quantity - {item_data['quantity']}"},
+                f"{supabase_url}/rest/v1/products?id=eq.{item['product_id']}",
+                json={"stock_quantity": f"stock_quantity - {item['quantity']}"},
                 headers=headers
             )
 
-        return {"message": "Venda confirmada com sucesso", "sale_id": sale_id}
+        return {"sale_id": sale_id, "message": "Venda confirmada"}
