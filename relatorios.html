@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatórios | Stunner System</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+      min-height: 100vh;
+      padding-bottom: 60px;
+      color: #1e293b;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2563eb;
+    }
+
+    .filter-section {
+      padding: 0 20px 20px;
+      background: white;
+      margin: 16px 0;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .date-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .date-row input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    .btn-filter {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin: 0 20px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .report-table th {
+      background: #e0f2fe;
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #0369a1;
+      font-size: 13px;
+    }
+
+    .report-table td {
+      padding: 12px 10px;
+      font-size: 14px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .report-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px 20px;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .total-section {
+      padding: 16px 20px;
+      background: white;
+      margin: 20px 0;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      font-weight: 600;
+      color: #1e40af;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(102, 102, 102, 0.85);
+      font-style: italic;
+      font-weight: 300;
+      padding: 8px 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="page-title">Relatório de Vendas</h1>
+  </header>
+
+  <div class="filter-section">
+    <div class="date-row">
+      <input type="date" id="dateFrom" />
+      <input type="date" id="dateTo" />
+    </div>
+    <button class="btn-filter" onclick="loadReport()">Gerar Relatório</button>
+  </div>
+
+  <div class="total-section" id="totalSection" style="display:none;">
+    Total Geral: <span id="totalAmount">0 MT</span>
+  </div>
+
+  <table class="report-table" id="reportTable">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Preço</th>
+        <th>Qtd</th>
+        <th>Subtotal</th>
+        <th>Vendedor</th>
+      </tr>
+    </thead>
+    <tbody id="reportBody">
+      <tr><td colspan="5" class="loading">Selecione um período e gere o relatório</td></tr>
+    </tbody>
+  </table>
+
+  <footer>© Powered by Stunner System | 2S_Benjanuário</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
+    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Define o período padrão: hoje
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateFrom').value = today;
+    document.getElementById('dateTo').value = today;
+
+    async function checkAuth() {
+      const {  { user } } = await supabase.auth.getUser();
+      if (!user) window.location.href = 'index.html';
+    }
+
+    async function loadReport() {
+      const from = document.getElementById('dateFrom').value;
+      const to = document.getElementById('dateTo').value;
+
+      if (!from || !to) {
+        alert('Selecione ambas as datas.');
+        return;
+      }
+
+      // Ajusta "to" para incluir todo o dia
+      const toEndOfDay = new Date(to);
+      toEndOfDay.setHours(23, 59, 59, 999);
+      const toFormatted = toEndOfDay.toISOString();
+
+      const { data, error } = await supabase
+        .from('sale_items')
+        .select(`
+          quantity,
+          unit_price,
+          subtotal,
+          products(name, product_code),
+          sales(created_at, user_id)
+        `)
+        .gte('sales.created_at', from)
+        .lte('sales.created_at', toFormatted)
+        .order('sales.created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('reportBody').innerHTML = `<tr><td colspan="5" style="text-align:center;color:#b91c1c;">Erro ao carregar dados.</td></tr>`;
+        document.getElementById('totalSection').style.display = 'none';
+        return;
+      }
+
+      if (data.length === 0) {
+        document.getElementById('reportBody').innerHTML = `<tr><td colspan="5" class="loading">Nenhuma venda no período.</td></tr>`;
+        document.getElementById('totalSection').style.display = 'none';
+        return;
+      }
+
+      // Calcula total geral
+      const total = data.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+      document.getElementById('totalAmount').textContent = total.toFixed(2) + ' MT';
+      document.getElementById('totalSection').style.display = 'block';
+
+      // Renderiza tabela
+      document.getElementById('reportBody').innerHTML = data.map(item => {
+        const date = new Date(item.sales.created_at);
+        const vendedor = item.sales.user_id ? 'Usuário ' + item.sales.user_id.substring(0,8) : 'Sistema';
+        return `
+          <tr>
+            <td>
+              <div><strong>${item.products.name}</strong></div>
+              <div style="font-size:12px;color:#64748b;">${item.products.product_code}</div>
+            </td>
+            <td>${item.unit_price} MT</td>
+            <td>${item.quantity}</td>
+            <td>${item.subtotal} MT</td>
+            <td>${vendedor}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      // Carrega relatório do dia automaticamente
+      // loadReport(); // opcional
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Stunner System</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .login-card {
+      width: 95%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 36px 30px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #2575fc;
+      box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 117, 252, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 117, 252, 0.55);
+    }
+
+    .btn-google {
+      background: white;
+      color: #db4437;
+      margin-top: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-google:hover {
+      background: #f9f9f9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Rodapé fixo – assinatura Stunner System */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.85);
+      font-style: italic;
+      font-weight: 300;
+      padding: 8px 0;
+      background: rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo">
+      <h1>Stunner System</h1>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="input-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="exemplo@loja.com" autocomplete="email" />
+    </div>
+
+    <div class="input-group">
+      <label for="password">Senha</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button class="btn btn-primary" onclick="handleLogin()">
+      <span>Entrar</span>
+    </button>
+
+    <button class="btn btn-google" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24" style="fill: #DB4437;">
+        <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.388-7.439-7.574s3.345-7.574 7.439-7.574c2.32 0 3.848.936 4.858 1.96l3.368-3.303C18.476 1.57 16.08 0 12.24 0c-6.905 0-12.24 5.607-12.24 12.24s5.335 12.24 12.24 12.24c6.612 0 12.24-5.335 12.24-12.24 0-.45-.033-.894-.093-1.325H12.24z"/>
+      </svg>
+      <span>Entrar com Google</span>
+    </button>
+  </div>
+
+  <!-- Rodapé com sua assinatura -->
+  <footer>
+    © Powered by Stunner System | 2S_Benjanuário
+  </footer>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // 🔑 Substitua pelos seus dados do Supabase
+    const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
+    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function showMessage(text, type = 'error') {
+      const msg = document.getElementById('message');
+      msg.className = `message ${type}`;
+      msg.textContent = text;
+      setTimeout(() => { msg.textContent = ''; msg.className = ''; }, 5000);
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      if (!email || !password) return showMessage('Preencha todos os campos.');
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        showMessage('Erro: ' + (error.message.includes('Invalid login') ? 'Email ou senha incorretos.' : error.message));
+      } else {
+        showMessage('Login bem-sucedido! Redirecionando...', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      }
+    }
+
+    async function handleGoogleLogin() {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin + '/dashboard.html' }
+      });
+      if (error) showMessage('Erro ao conectar com Google.');
+    }
+
+    // Se já estiver logado, vai direto para o dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>

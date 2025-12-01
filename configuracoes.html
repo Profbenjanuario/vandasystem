@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurações | Stunner System</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+      min-height: 100vh;
+      padding-bottom: 60px;
+      color: #1e293b;
+    }
+
+    header {
+      padding: 24px 20px 16px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin: 24px 0 16px;
+      padding: 0 20px;
+      font-weight: 600;
+      color: #1e40af;
+    }
+
+    .form-container {
+      padding: 0 20px;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #334155;
+      font-size: 14px;
+    }
+
+    .input-group input, .input-group select, .input-group textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      font-size: 16px;
+      background: white;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+      outline: none;
+      border-color: #2575fc;
+      box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+    }
+
+    .file-upload {
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border 0.3s;
+    }
+
+    .file-upload:hover {
+      border-color: #2575fc;
+    }
+
+    .file-upload i {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #64748b;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 14px rgba(37, 117, 252, 0.4);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 117, 252, 0.55);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 12px;
+      margin: 16px 20px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .message.success { background: #d1fae5; color: #065f46; }
+    .message.error { background: #fee2e2; color: #b91c1c; }
+
+    /* Rodapé */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(102, 102, 102, 0.85);
+      font-style: italic;
+      font-weight: 300;
+      padding: 8px 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="page-title">Configurações da Loja</h1>
+  </header>
+
+  <div id="message"></div>
+
+  <form id="configForm" class="form-container">
+    <!-- Dados da Empresa -->
+    <h2 class="section-title">Dados da Empresa</h2>
+    <div class="input-group">
+      <label for="business_name">Nome da Empresa *</label>
+      <input type="text" id="business_name" required />
+    </div>
+    <div class="input-group">
+      <label for="address">Localização (Endereço Completo) *</label>
+      <input type="text" id="address" required />
+    </div>
+    <div class="input-group">
+      <label for="phone">Telefone *</label>
+      <input type="text" id="phone" required />
+    </div>
+    <div class="input-group">
+      <label for="nuit">NUIT *</label>
+      <input type="text" id="nuit" required />
+    </div>
+    <div class="input-group">
+      <label for="registration_number">Registo Único</label>
+      <input type="text" id="registration_number" />
+    </div>
+    <div class="input-group">
+      <label for="license_number">Alvará</label>
+      <input type="text" id="license_number" />
+    </div>
+    <div class="input-group">
+      <label>Logo da Empresa</label>
+      <div class="file-upload" onclick="document.getElementById('logo_input').click()">
+        <div>📁 Clique para enviar o logo</div>
+        <div style="font-size:12px;color:#64748b;margin-top:6px">(JPEG, PNG, até 2 MB)</div>
+      </div>
+      <input type="file" id="logo_input" accept="image/*" style="display:none" />
+    </div>
+
+    <!-- Dados do Proprietário -->
+    <h2 class="section-title">Dados do Proprietário</h2>
+    <div class="input-group">
+      <label for="owner_full_name">Nome Completo *</label>
+      <input type="text" id="owner_full_name" required />
+    </div>
+    <div class="input-group">
+      <label for="owner_nuit">NUIT do Proprietário *</label>
+      <input type="text" id="owner_nuit" required />
+    </div>
+    <div class="input-group">
+      <label for="owner_id_number">Nº do Bilhete de Identidade *</label>
+      <input type="text" id="owner_id_number" required />
+    </div>
+    <div class="input-group">
+      <label for="owner_gender">Sexo *</label>
+      <select id="owner_gender" required>
+        <option value="">Selecione</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Feminino">Feminino</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label for="owner_birthplace">Naturalidade *</label>
+      <input type="text" id="owner_birthplace" required />
+    </div>
+    <div class="input-group">
+      <label for="owner_residence">Residência *</label>
+      <input type="text" id="owner_residence" required />
+    </div>
+    <div class="input-group">
+      <label for="owner_phone">Telefone *</label>
+      <input type="text" id="owner_phone" required />
+    </div>
+
+    <button type="submit" class="btn">Salvar Configurações</button>
+  </form>
+
+  <!-- Rodapé com assinatura -->
+  <footer>
+    © Powered by Stunner System | 2S_Benjanuário
+  </footer>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
+    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Verifica login
+    async function checkAuth() {
+      const {  { user } } = await supabase.auth.getUser();
+      if (!user) window.location.href = 'index.html';
+    }
+
+    // Exibe mensagem
+    function showMessage(text, type = 'error') {
+      const msg = document.getElementById('message');
+      msg.className = `message ${type}`;
+      msg.textContent = text;
+      setTimeout(() => { msg.textContent = ''; msg.className = ''; }, 5000);
+    }
+
+    // Upload de logo para Supabase Storage
+    async function uploadLogo(file) {
+      if (!file) return null;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_logo.${fileExt}`;
+      const filePath = `logos/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('business-docs')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage
+        .from('business-docs')
+        .getPublicUrl(filePath);
+      return data.publicUrl;
+    }
+
+    // Salva ou atualiza business_profile
+    async function saveConfig(e) {
+      e.preventDefault();
+      const user = await supabase.auth.getUser();
+      if (!user.data?.user) return;
+
+      try {
+        const logoFile = document.getElementById('logo_input').files[0];
+        let logo_url = null;
+        if (logoFile) {
+          logo_url = await uploadLogo(logoFile);
+        }
+
+        const data = {
+          business_name: document.getElementById('business_name').value,
+          address: document.getElementById('address').value,
+          phone: document.getElementById('phone').value,
+          nuit: document.getElementById('nuit').value,
+          registration_number: document.getElementById('registration_number').value,
+          license_number: document.getElementById('license_number').value,
+          logo_url: logo_url,
+          owner_full_name: document.getElementById('owner_full_name').value,
+          owner_nuit: document.getElementById('owner_nuit').value,
+          owner_id_number: document.getElementById('owner_id_number').value,
+          owner_gender: document.getElementById('owner_gender').value,
+          owner_birthplace: document.getElementById('owner_birthplace').value,
+          owner_residence: document.getElementById('owner_residence').value,
+          owner_phone: document.getElementById('owner_phone').value,
+          updated_at: new Date().toISOString()
+        };
+
+        // Verifica se já existe
+        const { data: existing } = await supabase
+          .from('business_profile')
+          .select('id')
+          .limit(1);
+
+        if (existing && existing.length > 0) {
+          // Atualiza
+          const { error } = await supabase
+            .from('business_profile')
+            .update(data)
+            .eq('id', existing[0].id);
+          if (error) throw error;
+        } else {
+          // Insere
+          const { error } = await supabase
+            .from('business_profile')
+            .insert(data);
+          if (error) throw error;
+        }
+
+        showMessage('Configurações salvas com sucesso!', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+      } catch (err) {
+        console.error(err);
+        showMessage('Erro ao salvar: ' + (err.message || 'tente novamente'));
+      }
+    }
+
+    // Carrega configurações existentes (se houver)
+    async function loadExisting() {
+      const { data, error } = await supabase
+        .from('business_profile')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') return; // PGRST116 = not found
+      if (!data) return;
+
+      document.getElementById('business_name').value = data.business_name || '';
+      document.getElementById('address').value = data.address || '';
+      document.getElementById('phone').value = data.phone || '';
+      document.getElementById('nuit').value = data.nuit || '';
+      document.getElementById('registration_number').value = data.registration_number || '';
+      document.getElementById('license_number').value = data.license_number || '';
+      document.getElementById('owner_full_name').value = data.owner_full_name || '';
+      document.getElementById('owner_nuit').value = data.owner_nuit || '';
+      document.getElementById('owner_id_number').value = data.owner_id_number || '';
+      document.getElementById('owner_gender').value = data.owner_gender || '';
+      document.getElementById('owner_birthplace').value = data.owner_birthplace || '';
+      document.getElementById('owner_residence').value = data.owner_residence || '';
+      document.getElementById('owner_phone').value = data.owner_phone || '';
+    }
+
+    // Inicializa
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      await loadExisting();
+      document.getElementById('configForm').addEventListener('submit', saveConfig);
+    });
+  </script>
+</body>
+</html>

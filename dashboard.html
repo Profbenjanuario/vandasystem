@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="webtoken" content="width=device-width, initial-scale=1.0" />
+  <title>Carregando... | Stunner System</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+      min-height: 100vh;
+      padding-bottom: 90px;
+      color: #1e293b;
+    }
+
+    /* Cabeçalho com nome da loja */
+    header {
+      padding: 24px 20px 20px;
+      text-align: center;
+    }
+
+    .store-name {
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* Cards de Estatísticas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 20px;
+      padding: 0 20px 24px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(6px);
+      transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      margin: 8px 0;
+      background: linear-gradient(90deg, #1e40af, #0c4a6e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    /* Menu de Navegação Inferior */
+    .nav-container {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 400px;
+      width: 90%;
+      z-index: 1000;
+    }
+
+    .nav-btn {
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      color: white;
+      border: none;
+      border-radius: 18px;
+      padding: 14px 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px rgba(37, 117, 252, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(37, 117, 252, 0.55);
+    }
+
+    .nav-btn i {
+      font-size: 20px;
+    }
+
+    /* Rodapé com assinatura */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(102, 102, 102, 0.85);
+      font-style: italic;
+      font-weight: 300;
+      padding: 8px 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1001;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px 20px 30px;
+      color: #64748b;
+      font-style: italic;
+      font-size: 16px;
+    }
+
+    /* Ícones (Font Awesome via CDN) */
+    .icon {
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="store-name">Carregando...</h1>
+    <p class="subtitle">Bem-vindo ao painel de gestão</p>
+  </header>
+
+  <main>
+    <div id="stats-container" class="loading">Carregando dados reais da sua loja...</div>
+  </main>
+
+  <!-- Navegação inferior com botões bonitos -->
+  <div class="nav-container">
+    <button class="nav-btn" onclick="window.location='produtos.html'">
+      <span>📦</span>
+      Produtos
+    </button>
+    <button class="nav-btn" onclick="window.location='vendas.html'">
+      <span>🧾</span>
+      Vendas
+    </button>
+    <button class="nav-btn" onclick="window.location='configuracoes.html'">
+      <span>⚙️</span>
+      Configurações
+    </button>
+  </div>
+
+  <!-- Rodapé fixo com sua assinatura -->
+  <footer>
+    © Powered by Stunner System | 2S_Benjanuário
+  </footer>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
+    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Verifica se o usuário está logado
+    async function checkAuth() {
+      const {  { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = 'index.html';
+      }
+      return user;
+    }
+
+    // Busca o nome real da loja
+    async function getBusinessName() {
+      const { data, error } = await supabase
+        .from('business_profile')
+        .select('business_name')
+        .single();
+
+      if (error) return 'Minha Loja';
+      return data?.business_name || 'Loja sem nome';
+    }
+
+    // Busca métricas reais do Supabase (sem simulação!)
+    async function fetchRealStats() {
+      const stats = {
+        products: 0,
+        salesToday: 0,
+        lowStock: 0,
+        customers: 0
+      };
+
+      // Total de produtos
+      const { count: products } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true });
+
+      // Vendas de hoje
+      const today = new Date().toISOString().split('T')[0];
+      const { count: salesToday } = await supabase
+        .from('sales')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', today);
+
+      // Produtos com stock ≤ 3
+      const { count: lowStock } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .lte('stock_quantity', 3);
+
+      // Clientes (opcional)
+      let customers = 0;
+      try {
+        const { count } = await supabase
+          .from('customers')
+          .select('*', { count: 'exact', head: true });
+        customers = count;
+      } catch (e) {
+        // Ignora se tabela não existir
+      }
+
+      return {
+        products: products || 0,
+        salesToday: salesToday || 0,
+        lowStock: lowStock || 0,
+        customers: customers
+      };
+    }
+
+    // Renderiza o dashboard com dados reais
+    async function initDashboard() {
+      await checkAuth();
+
+      const businessName = await getBusinessName();
+      document.title = `${businessName} | Stunner System`;
+      document.querySelector('.store-name').textContent = businessName;
+
+      const stats = await fetchRealStats();
+
+      document.getElementById('stats-container').innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${stats.products}</div>
+            <div class="stat-label">Produtos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.salesToday}</div>
+            <div class="stat-label">Vendas Hoje</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.lowStock}</div>
+            <div class="stat-label">Stock Baixo</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.customers}</div>
+            <div class="stat-label">Clientes</div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>
