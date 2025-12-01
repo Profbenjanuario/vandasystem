@@ -9,7 +9,10 @@ import httpx
 import jwt
 
 app = FastAPI(title="Stunner System API")
-
+# Adicione esta rota no seu main.py
+@app.get("/")
+async def health_check():
+    return {"status": "online", "service": "Stunner System API"}
 # CORS — permite requisições do GitHub Pages
 app.add_middleware(
     CORSMiddleware,
